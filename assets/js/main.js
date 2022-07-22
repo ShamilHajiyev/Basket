@@ -1,7 +1,7 @@
 let buttons = document.querySelectorAll('#addToCart');
 let products;
 const existingId = [];
-let mainCount = document.querySelector('#count');
+let count = document.querySelector('#count');
 
 if (JSON.parse(localStorage.getItem('products')) === null) {
     products = [];
@@ -13,7 +13,7 @@ else{
     })
 }
 
-mainCount.innerHTML = products.length;
+count.innerHTML = products.length;
 
 buttons.forEach(btn => btn.addEventListener('click', function () {
     let id = Number(this.parentElement.parentElement.parentElement.id);
@@ -32,7 +32,7 @@ buttons.forEach(btn => btn.addEventListener('click', function () {
         Find(id).Count++;
     }
     localStorage.setItem('products', JSON.stringify(products));
-    mainCount.innerHTML = products.length;
+    count.innerHTML = products.length;
 }))
 
 function Find(id) {
