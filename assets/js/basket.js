@@ -1,6 +1,23 @@
 let tableBody = document.querySelector('#tbody');
-let totalCountSpan = document.querySelector('#totalCount');
-let totalPriceSpan = document.querySelector('#totalPrice');
+let totalCountSpan = document.querySelector('#total-count');
+let totalPriceSpan = document.querySelector('#total-price');
+
+function Change(e) {
+    if(e.target.value > Number(document.querySelector('#product-count').max)){
+        e.target.value = 100;
+    }
+    if(e.target.value < Number(document.querySelector('#product-count').min)){
+        e.target.value = 1;
+    }
+    products.forEach(product => {
+        if (Find(Number(e.target.parentElement.parentElement.querySelector('#id').innerHTML)).Id === product.Id) {
+            product.Count = Number(e.target.value);
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+    });
+    Show();
+}
+
 
 function Show() {
     let text = '';
@@ -12,7 +29,7 @@ function Show() {
             <td id="id">${product.Id}</td>
             <td><img src="${product.Img}" alt=""></td>
             <td>${product.Name}</td>
-            <td><input type="number" min="1" value="${product.Count}"></td>
+            <td><input id="product-count" oninput="Change(event)" type="number" min="1" max="100" value="${product.Count}" style="width: 100%"></td>
             <td>${Number(product.Price).toFixed(2)}</td>
             <td>${(product.Price * product.Count).toFixed(2)}</td>
             <td><button class="btn btn-danger" onclick="Delete(event)">Delete</button></td>
