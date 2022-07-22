@@ -1,54 +1,60 @@
 let tableBody = document.querySelector('#tbody');
-let totalCountSpan = document.querySelector('#total-count');
-let totalPriceSpan = document.querySelector('#total-price');
+let totalCountLabel = document.querySelector('#total-count');
+let totalPriceLabel = document.querySelector('#total-price');
+
+function Show() {
+    let rows = '';
+    let totalCount = 0;
+    let totalPrice = 0;
+
+    products.forEach(product => {
+        rows += `
+            <tr>
+                <td id="id">${product.Id}</td>
+                <td><img src="${product.Image}" alt="Product Image"></td>
+                <td>${product.Title}</td>
+                <td><input onchange="Change(event.target)" type="number" min="1" value="${product.Count}" style="width: 100%"></td>
+                <td>${product.Price.toFixed(2)} AZN</td>
+                <td>${(product.Price * product.Count).toFixed(2)} AZN</td>
+                <td><button class="btn btn-danger" onclick="Delete(event.target)">Delete</button></td>
+            </tr>
+        `
+        totalCount += product.Count;
+        totalPrice += Number((product.Price * product.Count).toFixed(2));
+    });
+    
+    totalCountLabel.innerHTML = totalCount;
+    totalPriceLabel.innerHTML = totalPrice;
+    tableBody.innerHTML = rows;
+}
+
+function Delete(e){
+    let row = e.parentElement.parentElement;
+    let foundId = Number(row.querySelector('#id').innerHTML);
+    let found = FindProduct(foundId);
+    let foundIndex = products.indexOf(found);
+
+    products.splice(foundIndex, 1)
+    ShowIndex();
+    Show();
+}
 
 function Change(e) {
-    if(e.target.value > Number(document.querySelector('#product-count').max)){
-        e.target.value = 100;
+    let row = e.parentElement.parentElement;
+    let productCount = e.value;
+    if(productCount < Number(e.min)){
+        productCount = 1;
     }
-    if(e.target.value < Number(document.querySelector('#product-count').min)){
-        e.target.value = 1;
-    }
+
     products.forEach(product => {
-        if (Find(Number(e.target.parentElement.parentElement.querySelector('#id').innerHTML)).Id === product.Id) {
-            product.Count = Number(e.target.value);
-            localStorage.setItem('products', JSON.stringify(products));
+        let productId = row.querySelector('#id');
+        let foundId = FindProduct(Number(productId.innerHTML)).Id;
+        if (foundId === product.Id) {
+            product.Count = Number(productCount);
+            ShowIndex();
         }
     });
     Show();
 }
 
-
-function Show() {
-    let text = '';
-    let totalCount = 0;
-    let totalPrice = 0;
-    products.forEach(product => {
-        text += `
-        <tr>
-            <td id="id">${product.Id}</td>
-            <td><img src="${product.Img}" alt=""></td>
-            <td>${product.Name}</td>
-            <td><input id="product-count" oninput="Change(event)" type="number" min="1" max="100" value="${product.Count}" style="width: 100%"></td>
-            <td>${Number(product.Price).toFixed(2)}</td>
-            <td>${(product.Price * product.Count).toFixed(2)}</td>
-            <td><button class="btn btn-danger" onclick="Delete(event)">Delete</button></td>
-        </tr>
-        `
-        totalCount += product.Count;
-        totalPrice += Number((product.Price * product.Count).toFixed(2));
-    });
-    totalCountSpan.innerHTML = totalCount;
-    totalPriceSpan.innerHTML = totalPrice;
-    tableBody.innerHTML = text;
-}
-
 Show();
-
-function Delete(e){
-    let found = Find(Number(e.target.parentElement.parentElement.querySelector('#id').innerHTML));
-    products.splice(products.indexOf(found), 1)
-    localStorage.setItem('products', JSON.stringify(products));
-    count.innerHTML = products.length;
-    Show();
-}

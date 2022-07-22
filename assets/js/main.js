@@ -3,44 +3,53 @@ let products;
 const existingId = [];
 let count = document.querySelector('#count');
 
-if (JSON.parse(localStorage.getItem('products')) === null) {
-    products = [];
-}
-else{
-    products = JSON.parse(localStorage.getItem('products'));
-    products.forEach(product => {
-        existingId.push(product.Id);
-    })
+function CreateProducts() {
+    if (JSON.parse(localStorage.getItem('products')) === null) {
+        products = [];
+    }
+    else{
+        products = JSON.parse(localStorage.getItem('products'));
+        products.forEach(product => {
+            existingId.push(product.Id);
+        })
+    }
 }
 
-count.innerHTML = products.length;
+function ShowIndex() {
+    count.innerHTML = products.length;
+    localStorage.setItem('products', JSON.stringify(products));
+}
+
+function FindProduct(productId) {
+    let foundProduct = null;
+    products.forEach(product => {
+        if (productId === product.Id) {
+            foundProduct = product;
+        }
+    });
+    return foundProduct;
+}
+
 
 buttons.forEach(btn => btn.addEventListener('click', function () {
-    let id = Number(this.parentElement.parentElement.parentElement.id);
-    if (existingId.length === 0 || !existingId.includes(id)) {
+    let productCard = this.parentElement.parentElement.parentElement;
+    let productId = Number(productCard.id);
+    if (existingId.length === 0 || !existingId.includes(productId)) {
         let product = {
-            Id: id,
-            Img: this.parentElement.previousElementSibling.src,
-            Name: this.parentElement.querySelector('.card-title').innerText,
-            Price: this.parentElement.querySelector('#price').innerText,
+            Id: productId,
+            Image: productCard.querySelector('img').src,
+            Title: productCard.querySelector('#product-title').innerText,
+            Price: Number(productCard.querySelector('#product-price').innerText),
             Count: 1
         }
         existingId.push(product.Id);
         products.push(product);
     }
     else {
-        Find(id).Count++;
+        FindProduct(productId).Count++;
     }
-    localStorage.setItem('products', JSON.stringify(products));
-    count.innerHTML = products.length;
+    ShowIndex();
 }))
 
-function Find(id) {
-    let foundProduct = null;
-    products.forEach(product => {
-        if (id === product.Id) {
-            foundProduct = product;
-        }
-    });
-    return foundProduct;
-}
+CreateProducts();
+ShowIndex();
